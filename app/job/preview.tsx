@@ -15,8 +15,6 @@ export default function JobPreviewScreen() {
 
   const serviceType = SERVICE_TYPES.find((s) => s.id === draft.serviceType);
 
-  const { addJob } = useJobStore();
-
   const handlePost = () => {
     if (!draft.serviceType || !draft.startTime || !draft.endTime || !draft.location || !draft.budgetMin || !draft.budgetMax) {
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');

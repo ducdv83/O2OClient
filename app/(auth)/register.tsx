@@ -4,6 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { authApi } from '../../services/api/auth.api';
 
+const DEV_OTP = '123456';
+
 export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -11,6 +13,15 @@ export default function RegisterScreen() {
   const handleSendOTP = async () => {
     if (!phone || phone.length < 10) {
       Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại hợp lệ');
+      return;
+    }
+
+    if (__DEV__) {
+      router.push({
+        pathname: '/(auth)/verify-otp',
+        params: { phone, type: 'register', requestId: 'dev' },
+      });
+      Alert.alert('Dev OTP', `Mã OTP mặc định: ${DEV_OTP}`);
       return;
     }
 

@@ -6,6 +6,8 @@ import OTPInput from '../../components/auth/OTPInput';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../services/api/auth.api';
 
+const DEV_OTP = '123456';
+
 export default function VerifyOTPScreen() {
   const { phone, type, requestId } = useLocalSearchParams<{
     phone: string;
@@ -32,6 +34,22 @@ export default function VerifyOTPScreen() {
   const handleVerifyOTP = async (enteredOtp: string) => {
     if (!currentRequestId) {
       Alert.alert('Lỗi', 'Không tìm thấy request ID. Vui lòng gửi lại mã OTP.');
+      return;
+    }
+
+    if (__DEV__ && enteredOtp === DEV_OTP) {
+      setToken('dev-token');
+      setUser({
+        id: 'dev-user',
+        phone,
+        role: type === 'register' ? 'CLIENT' : 'CLIENT',
+        fullName: 'Dev User',
+      });
+      if (type === 'register') {
+        router.replace('/(auth)/onboarding');
+      } else {
+        router.replace('/(tabs)');
+      }
       return;
     }
 
@@ -66,6 +84,14 @@ export default function VerifyOTPScreen() {
   const handleResendOTP = async () => {
     if (!phone) {
       Alert.alert('Lỗi', 'Không tìm thấy số điện thoại');
+      return;
+    }
+
+    if (__DEV__) {
+      setCurrentRequestId('dev');
+      setCountdown(60);
+      setCanResend(false);
+      Alert.alert('Dev OTP', `Mã OTP mặc định: ${DEV_OTP}`);
       return;
     }
 
