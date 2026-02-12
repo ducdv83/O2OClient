@@ -1,17 +1,18 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
-import { colors } from '../../constants/colors';
 
 export default function WelcomeScreen() {
   return (
     <View className="flex-1 bg-white items-center justify-center px-6">
       <StatusBar style="dark" />
-      
-      {/* Logo/Icon placeholder */}
-      <View className="w-32 h-32 bg-blue-500 rounded-full items-center justify-center mb-8">
-        <Text className="text-white text-4xl font-bold">O2O</Text>
-      </View>
+
+      {/* Logo */}
+      <Image
+        source={require('../../assets/logo.png')}
+        style={{ width: 160, height: 160, marginBottom: 32 }}
+        resizeMode="contain"
+      />
 
       <Text className="text-3xl font-bold text-gray-900 text-center mb-4">
         Chào mừng đến với{'\n'}O2O Care Platform

@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useJobStore } from '../../store/job.store';
 import { SERVICE_TYPES } from '../../constants/serviceTypes';
 import { formatDate, formatTime, formatCurrency } from '../../utils/format';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type TabType = 'DRAFT' | 'OPEN' | 'BOOKED' | 'COMPLETED' | 'CANCELLED';
 
@@ -22,17 +23,17 @@ export default function JobsScreen() {
   const getStatusColor = (status: string): string => {
     switch (status) {
       case 'DRAFT':
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-slate-100 text-slate-700';
       case 'OPEN':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-blue-50 text-blue-700';
       case 'BOOKED':
-        return 'bg-green-100 text-green-700';
+        return 'bg-emerald-50 text-emerald-700';
       case 'COMPLETED':
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-slate-100 text-slate-700';
       case 'CANCELLED':
-        return 'bg-red-100 text-red-700';
+        return 'bg-rose-50 text-rose-700';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-slate-100 text-slate-700';
     }
   };
 
@@ -64,64 +65,70 @@ export default function JobsScreen() {
   const filteredJobs = getJobsByTab(activeTab);
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-slate-50" edges={['top']}>
       <StatusBar style="dark" />
-      
+
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-gray-200">
+      <View className="bg-white px-6 pt-6 pb-5 border-b border-slate-100">
         <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900">Yêu cầu của tôi</Text>
+          <Text className="text-2xl font-semibold text-slate-900">
+            Yêu cầu của tôi
+          </Text>
           <TouchableOpacity
-            className="bg-blue-500 px-4 py-2 rounded-lg"
+            className="bg-blue-600 px-5 py-2 rounded-full"
             onPress={() => router.push('/job/create')}
           >
-            <Text className="text-white font-semibold">+ Tạo mới</Text>
+            <Text className="text-white text-sm font-semibold">+ Tạo mới</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="bg-white border-b border-gray-200"
-      >
-        <View className="flex-row px-4">
+      <View className="bg-white px-4 pt-2 pb-2 border-b border-slate-100">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 8 }}
+        >
           {tabs.map((tab) => (
             <TouchableOpacity
               key={tab.key}
-              className={`px-4 py-3 border-b-2 ${
-                activeTab === tab.key
-                  ? 'border-blue-500'
-                  : 'border-transparent'
+              className={`h-9 px-4 rounded-full items-center justify-center ${
+                activeTab === tab.key ? 'bg-blue-600' : 'bg-slate-100'
               }`}
               onPress={() => setActiveTab(tab.key)}
             >
               <Text
-                className={
-                  activeTab === tab.key
-                    ? 'text-blue-500 font-semibold'
-                    : 'text-gray-600'
-                }
+                className={`text-sm font-medium ${
+                  activeTab === tab.key ? 'text-white' : 'text-slate-700'
+                }`}
               >
                 {tab.label}
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Jobs List */}
-      <ScrollView className="flex-1 px-6 py-4">
+      <ScrollView
+        className="flex-1 px-4 pt-2"
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
         {filteredJobs.length === 0 ? (
-          <View className="items-center justify-center py-12">
-            <Text className="text-4xl mb-4">📋</Text>
-            <Text className="text-gray-500 text-lg mb-2">
+          <View className="bg-white rounded-2xl p-8 items-center mt-8 border border-slate-100">
+            <View className="w-12 h-12 rounded-full bg-blue-50 mb-4 items-center justify-center">
+              <Text className="text-2xl">📋</Text>
+            </View>
+            <Text className="text-slate-900 text-lg font-semibold mb-2 text-center">
+              Chưa có yêu cầu nào
+            </Text>
+            <Text className="text-slate-600 text-center text-sm mb-4">
               Chưa có yêu cầu nào trong danh mục này
             </Text>
             {activeTab === 'OPEN' && (
               <TouchableOpacity
-                className="bg-blue-500 px-6 py-3 rounded-lg mt-4"
+                className="bg-blue-600 px-6 py-3 rounded-full"
                 onPress={() => router.push('/job/create')}
               >
                 <Text className="text-white font-semibold">Tạo yêu cầu mới</Text>
@@ -129,70 +136,77 @@ export default function JobsScreen() {
             )}
           </View>
         ) : (
-          filteredJobs.map((job) => {
-            const serviceType = SERVICE_TYPES.find((s) => s.id === job.serviceType);
-            return (
-              <TouchableOpacity
-                key={job.id}
-                className="bg-white rounded-lg p-4 mb-4 shadow-sm"
-                onPress={() => router.push(`/job/${job.id}`)}
-              >
-                <View className="flex-row items-start justify-between mb-3">
-                  <View className="flex-1">
-                    <View className="flex-row items-center mb-2">
-                      <Text className="text-2xl mr-2">{serviceType?.icon}</Text>
-                      <Text className="text-lg font-semibold text-gray-900">
-                        {serviceType?.name}
-                      </Text>
-                    </View>
-                    <View
-                      className={`px-2 py-1 rounded self-start ${getStatusColor(
-                        job.status
-                      )}`}
-                    >
-                      <Text className="text-xs font-medium">
-                        {getStatusLabel(job.status)}
-                      </Text>
+          <View className="gap-4 mt-4">
+            {filteredJobs.map((job) => {
+              const serviceType = SERVICE_TYPES.find(
+                (s) => s.id === job.serviceType
+              );
+              return (
+                <TouchableOpacity
+                  key={job.id}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100"
+                  onPress={() => router.push(`/job/${job.id}`)}
+                >
+                  <View className="flex-row items-start justify-between mb-3">
+                    <View className="flex-1">
+                      <View className="flex-row items-center mb-2">
+                        <Text className="text-2xl mr-2">{serviceType?.icon}</Text>
+                        <Text className="text-lg font-semibold text-slate-900">
+                          {serviceType?.name}
+                        </Text>
+                      </View>
+                      <View
+                        className={`px-3 py-1 rounded-full self-start ${getStatusColor(
+                          job.status
+                        )}`}
+                      >
+                        <Text className="text-xs font-semibold">
+                          {getStatusLabel(job.status)}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <Text className="text-gray-700 mb-3" numberOfLines={2}>
-                  {job.description}
-                </Text>
+                  <Text className="text-slate-700 mb-3 text-sm" numberOfLines={2}>
+                    {job.description}
+                  </Text>
 
-                <View className="mb-3">
-                  <Text className="text-gray-600 text-sm mb-1">
-                    📅 {formatDate(job.startTime, 'dd/MM/yyyy')}
-                  </Text>
-                  <Text className="text-gray-600 text-sm">
-                    🕐 {formatTime(job.startTime)} - {formatTime(job.endTime)}
-                  </Text>
-                  <Text className="text-gray-600 text-sm mt-1">
-                    📍 {job.location.address}
-                  </Text>
-                </View>
-
-                <View className="flex-row items-center justify-between pt-3 border-t border-gray-200">
-                  <View>
-                    <Text className="text-gray-600 text-sm">Khung giá</Text>
-                    <Text className="text-gray-900 font-semibold">
-                      {formatCurrency(job.budgetMin)} - {formatCurrency(job.budgetMax)}/giờ
+                  <View className="mb-3">
+                    <Text className="text-slate-600 text-sm mb-1">
+                      📅 {formatDate(job.startTime, 'dd/MM/yyyy')}
+                    </Text>
+                    <Text className="text-slate-600 text-sm">
+                      🕐 {formatTime(job.startTime)} -{' '}
+                      {formatTime(job.endTime)}
+                    </Text>
+                    <Text className="text-slate-600 text-sm mt-1">
+                      📍 {job.location.address}
                     </Text>
                   </View>
-                  {job.candidateCount !== undefined && job.candidateCount > 0 && (
-                    <View className="bg-blue-50 px-3 py-1 rounded-full">
-                      <Text className="text-blue-700 text-sm font-semibold">
-                        {job.candidateCount} ứng viên
+
+                  <View className="flex-row items-center justify-between pt-3 border-t border-slate-100">
+                    <View>
+                      <Text className="text-slate-600 text-sm">Khung giá</Text>
+                      <Text className="text-slate-900 font-semibold">
+                        {formatCurrency(job.budgetMin)} -{' '}
+                        {formatCurrency(job.budgetMax)}/giờ
                       </Text>
                     </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })
+                    {job.candidateCount !== undefined &&
+                      job.candidateCount > 0 && (
+                        <View className="bg-blue-50 px-3 py-1 rounded-full">
+                          <Text className="text-blue-700 text-sm font-semibold">
+                            {job.candidateCount} ứng viên
+                          </Text>
+                        </View>
+                      )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
